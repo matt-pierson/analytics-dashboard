@@ -1,0 +1,55 @@
+---
+alwaysApply: true
+---
+# LaunchDarkly — Architectural Rules for AI-Assisted Development
+
+## Provider Architecture (CRITICAL — hydration safety)
+
+- `src/app/layout.js` MUST be a Server Component. Never add `'use client'` to it.
+- The LaunchDarkly provider MUST live in `src/components/LDProviderWrapper.js` with `'use client'` at the top.
+- Never call `asyncWithLDProvider` or any LD React SDK hook directly in `layout.js`.
+- This pattern prevents Next.js App Router hydration mismatches.
+
+## Client vs Server SDK boundaries
+
+- `launchdarkly-react-client-sdk` — client components only (`'use client'` files)
+- `@launchdarkly/node-server-sdk` — API routes only (`src/app/api/**`)
+- `@launchdarkly/server-sdk-ai` — API routes only, never in React components
+- Never import `@launchdarkly/node-server-sdk` or `@launchdarkly/server-sdk-ai` in any component
+
+## Named imports (critical)
+
+- CORRECT: `import { init } from '@launchdarkly/node-server-sdk'`
+- WRONG:   `import init from '@launchdarkly/node-server-sdk'`
+
+## Flag evaluation patterns
+
+- Read flag values with `useFlags()` in React components
+- Read flag values with `ldClient.variation()` AFTER `ldClient.identify()` resolves
+- Never read `.variation()` before `identify()` resolves — values will reflect the old context
+- `ldClient` can be null before the provider resolves — always null-check before calling any method
+
+## AI Config patterns
+
+- `aiConfig.model` is an object — use `aiConfig.model?.name`, never pass the object directly
+- Always pass `userKey` and `userPlan` from the frontend to `/api/chat` so server-side targeting fires correctly
+- Never hardcode user context in API routes
+
+## Environment variables
+
+- `NEXT_PUBLIC_LD_CLIENT_KEY` — browser-safe, used in `LDProviderWrapper.js`
+- `LD_SERVER_KEY` — server only, never reference in any component
+- `GOOGLE_AI_API_KEY` — server only, exact name (not GOOGLE_API_KEY)
+- Never add `NEXT_PUBLIC_` prefix to server-only keys
+
+## Toast / demo polish
+
+- `<Toaster />` is placed once in `src/app/page.js` — never in individual components
+- Use `useRef` guard for any `useEffect` toast that should fire exactly once (React 18 Strict Mode fires effects twice in development)
+
+## New component checklist
+
+When generating any new component:
+1. Determine if it needs browser APIs or LD hooks → if yes, add `'use client'`
+2. If it uses LD flags, import from `launchdarkly-react-client-sdk` only
+3. Never import server-side LD packages into components
