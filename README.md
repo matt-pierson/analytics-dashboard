@@ -48,10 +48,10 @@ npm install
 
 ### 3. Configure environment variables
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Edit `.env.local` with your values:
+Edit `.env`:
 
 | Variable | Where to find it |
 |---|---|
@@ -96,22 +96,12 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ### Docker
 
-> ⚠️ `NEXT_PUBLIC_` variables are baked into the JS bundle at **build time**. Pass them as `--build-arg` during `docker build` — not as `-e` at `docker run`.
+Spin up the entire environment with a single command. Docker Compose will automatically pull your LaunchDarkly and Google AI SDK keys from your `.env` file and pass them securely to the build and runtime environments.
 
-**Build:**
-```bash
-docker build \
-  --build-arg NEXT_PUBLIC_LD_CLIENT_KEY=your_client_side_id \
-  -t analytics-dashboard .
-```
-
-**Run:**
-```bash
-docker run -p 3000:3000 \
-  -e LD_SERVER_KEY=your_server_sdk_key \
-  -e GOOGLE_AI_API_KEY=your_google_ai_key \
-  analytics-dashboard
-```
+**Build and Run:**
+\`\`\`bash
+docker compose up --build
+\`\`\`
 
 Open [http://localhost:3000](http://localhost:3000)
 
