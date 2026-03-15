@@ -1,0 +1,13 @@
+services:
+  analytics-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Pulls the client key from the environment to bake into the Next.js build
+        NEXT_PUBLIC_LD_CLIENT_KEY: ${NEXT_PUBLIC_LD_CLIENT_KEY}
+    ports:
+      - "3000:3000"
+    env_file:
+      # Injects server keys into the runtime container
+      - .env
