@@ -22,6 +22,7 @@ Instantly release, remediate, experiment, and control AI behavior with LaunchDar
 - **Feature Flags:** LaunchDarkly React Client SDK, Node Server SDK, AI SDK
 - **AI:** Google Gemini via `@google/generative-ai` (free tier)
 - **Charts:** Recharts
+- **Demo Polish:** react-hot-toast — surfaces flag evaluations and context switches as real-time toast notifications
 
 ---
 
@@ -117,10 +118,23 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ### Part 2: Targeting
 1. Demo Console (bottom-right) shows **Matt Pierson** active — table view, `control` variant
-2. Click **Brad Bunce** in the Demo Console
-3. `ldClient.identify()` sends Brad's context: 42,000 MAU, enterprise plan
-4. Retention heatmap switches to visual heatmap variant instantly — no page reload
-5. Click **Matt Pierson** — returns to table view
+2. An initial toast confirms the starting context and flag evaluation on page load
+3. Click **Brad Bunce** in the Demo Console
+4. `ldClient.identify()` sends Brad's context: 42,000 MAU, enterprise plan
+5. Retention heatmap switches to visual heatmap variant instantly — toast confirms `retention-heatmap-variant → heatmap`
+6. Click **Matt Pierson** — returns to table view, toast confirms `retention-heatmap-variant → control`
+
+### Experimentation
+1. Open the Experiments tab in LaunchDarkly — view the running **Retention Heatmap vs Table** experiment
+2. Click any cohort row in the Retention panel to fire a `retention-viewed-detail` event
+3. Metric data accumulates in the experiment results in real time
+
+### AI Configs
+1. Chat with the Analytics Assistant — note the **gemini-2.5-flash-lite** model badge (Matt's context) and the toast confirming the model served
+2. Switch Demo Console to **Brad Bunce**
+3. Send another message — badge and toast both update to **gemini-2.5-flash**
+4. Model and system prompt changed with zero deployment — controlled entirely by the AI Config targeting rule
+
 
 ### Experimentation
 1. Open the Experiments tab in LaunchDarkly to view the running **Retention Heatmap vs Table** experiment
