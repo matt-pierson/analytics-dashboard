@@ -1,65 +1,107 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import FunnelChart from '../components/FunnelChart';
+import RetentionHeatmap from '../components/RetentionHeatmap';
+import ChatBot from '../components/ChatBot';
+import UserSwitcher from '../components/UserSwitcher';
+
+export default function DashboardPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#f5f7fa',
+        padding: '0 0 64px 0',
+      }}
+    >
+      <main
+        style={{
+          maxWidth: 1100,
+          margin: '0 auto',
+          padding: '38px 20px 0 20px',
+        }}
+      >
+        <header style={{ marginBottom: 30 }}>
+          <h1 style={{
+            fontSize: 33,
+            fontWeight: 800,
+            letterSpacing: 0.2,
+            margin: 0,
+            padding: 0,
+            color: '#1a2638'
+          }}>
+            📊 Analytics Dashboard
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <div
+            style={{
+              fontSize: 16,
+              color: '#6f7c87',
+              marginTop: 7,
+              fontWeight: 500,
+              letterSpacing: 0.02,
+              fontFamily: 'monospace',
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Powered by LaunchDarkly Feature Management
+          </div>
+        </header>
+
+        <section
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 32,
+            marginBottom: 36,
+          }}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: 17,
+              boxShadow: '0 3px 14px 0 #0d203c13',
+              border: '1.3px solid #e4ecf3',
+              padding: '30px 24px 22px 24px',
+              minHeight: 365,
+              display: 'flex',
+              flexDirection: 'column'
+            }}
           >
-            Documentation
-          </a>
-        </div>
+            <FunnelChart />
+          </div>
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: 17,
+              boxShadow: '0 3px 14px 0 #0d203c13',
+              border: '1.3px solid #e4ecf3',
+              padding: '30px 24px 22px 24px',
+              minHeight: 365,
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <RetentionHeatmap />
+          </div>
+        </section>
+
+        <section
+          style={{
+            background: '#fff',
+            borderRadius: 17,
+            boxShadow: '0 3px 14px 0 #0d203c13',
+            border: '1.3px solid #e4ecf3',
+            padding: '28px 24px 20px 24px',
+            marginBottom: 55,
+            maxWidth: 900,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          <ChatBot />
+        </section>
       </main>
+
+      <UserSwitcher />
     </div>
   );
 }
