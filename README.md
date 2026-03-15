@@ -1,4 +1,4 @@
-# 📊 Analytics Dashboard with Feature Flags & AI Assistant
+# 📊 Analytics Dashboard — LaunchDarkly Feature Management Demo
 
 Instantly release, remediate, experiment, and control AI behavior with LaunchDarkly-powered feature flags.
 
@@ -6,134 +6,148 @@ Instantly release, remediate, experiment, and control AI behavior with LaunchDar
 
 ## ✅ Feature Checklist
 
-| Requirement                                  | Description                                                                                                  | Status |
-|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------|--------|
-| Part 1: Release & Remediate                  | Toggle `show-funnel-chart` to reveal/hide funnel chart, streaming UI updates, instant rollback (no deploy)   |   ✅   |
-| Part 1: Flag Trigger                         | Instant toggle via dashboard; no deployment required                                                         |   ✅   |
-| Part 2: Targeting                            | Target Brad by key, MAU users, and by plan                                                                  |   ✅   |
-| Extra Credit: Experimentation                | Track `retention-viewed-detail` cohort metric for experimentation                                            |   ✅   |
-| Extra Credit: AI Configs                     | Native Analytics Assistant AI Config, swaps Gemini models based on LD flag                                   |   ✅   |
+| Requirement | Description | Status |
+|---|---|---|
+| Part 1: Release & Remediate | Toggle `show-funnel-chart` to reveal/hide funnel chart — streaming UI updates, instant rollback with no deployment | ✅ |
+| Part 1: Flag Trigger | Instant toggle via LaunchDarkly dashboard — no deployment required | ✅ |
+| Part 2: Targeting | Brad targeted by user key, MAU threshold, and plan attribute | ✅ |
+| Extra Credit: Experimentation | `retention-viewed-detail` click metric tracks cohort engagement across control/heatmap variants | ✅ |
+| Extra Credit: AI Configs | Native Analytics Assistant AI Config swaps Gemini models per user context with no code deploy | ✅ |
 
 ---
 
 ## 🛠️ Tech Stack
 
-- Next.js, React, TypeScript
-- LaunchDarkly (Client & Server SDKs)
-- Gemini AI via Google Vertex API
+- **Framework:** Next.js 14, React, JavaScript
+- **Feature Flags:** LaunchDarkly React Client SDK, Node Server SDK, AI SDK
+- **AI:** Google Gemini via `@google/generative-ai` (free tier)
+- **Charts:** Recharts
 
 ---
 
 ## 📋 Prerequisites
 
-- Node.js ≥ 18
-- LaunchDarkly account (Client & Server keys)
-- Google Gemini API key
+- Node.js ≥ 18 OR Docker
+- LaunchDarkly account (client-side ID + server SDK key)
+- Google AI Studio API key (free — aistudio.google.com)
 
 ---
 
 ## 🚀 Setup
 
-1. **Clone the repo**
-   ```bash
-   git clone <your-repo-url>
-   cd analytics-dashboard
-   ```
+### 1. Clone the repo
+```bash
+git clone https://github.com/matt-pierson/analytics-dashboard.git
+cd analytics-dashboard
+```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### 2. Install dependencies
+```bash
+npm install
+```
 
-3. **Configure environment**
-   ```bash
-   cp .env.example .env.local
-   ```
-   - Edit `.env.local`:
-     - `NEXT_PUBLIC_LD_CLIENT_KEY` = your LaunchDarkly *client-side* key
-     - `LD_SERVER_KEY` = your LaunchDarkly *server* key
-     - `GOOGLE_AI_API_KEY` = your Gemini API key
+### 3. Configure environment variables
+```bash
+cp .env.example .env.local
+```
 
-4. **Create Feature Flags**
+Edit `.env.local` with your values:
 
-   | Flag Name                | Type     | Description                                       | Client-side SDK Enabled? |
-   |-------------------------|----------|---------------------------------------------------|-------------------------|
-   | `show-funnel-chart`     | Boolean  | Show/hide funnel chart for release/remediation     | ✅                      |
-   | `retention-heatmap-variant` | String | Targeting for retention heatmap (see rules below)  | ✅                      |
+| Variable | Where to find it |
+|---|---|
+| `NEXT_PUBLIC_LD_CLIENT_KEY` | LD dashboard → Test environment → **Client-side ID** |
+| `LD_SERVER_KEY` | LD dashboard → Test environment → **SDK key** (starts with `sdk-`) |
+| `GOOGLE_AI_API_KEY` | aistudio.google.com → Get API key |
 
-5. **Create Gemini AI Config in LaunchDarkly**
-   - In LD dashboard: **Feature Flags → New Flag → AI Config**
-   - Name: `Analytics Assistant`
-   - Type: **Completion**
-   - Add variations:
-     - `Standard`: `{ "model": "gemini-2.5-flash-lite" }`
-     - `Premium`: `{ "model": "gemini-2.5-flash" }`
-   - Set targeting as required (e.g. premium users to "Premium", others "Standard")
+### 4. Create Feature Flags in LaunchDarkly (Test environment)
 
+| Flag Key | Type | Client-side SDK |
+|---|---|---|
+| `show-funnel-chart` | Boolean | ✅ Must enable |
+| `retention-heatmap-variant` | String — variations: `control`, `heatmap`, `sparklines` | ✅ Must enable |
+
+### 5. Create the Analytics Assistant AI Config
+
+1. LD Dashboard → **Create → AI Config → Completion**
+2. Name: `Analytics Assistant`
+3. Add variation **Standard**: model `gemini-2.5-flash-lite`, system prompt for general analytics assistance
+4. Add variation **Premium**: model `gemini-2.5-flash`, system prompt for enterprise-level analysis
+5. Set targeting rule: if `plan` is one of `enterprise` → serve **Premium**
+6. Default rule → serve **Standard**
+
+### 6. Add targeting rules to `retention-heatmap-variant`
+
+| Rule | Attribute | Condition | Serves |
+|---|---|---|---|
+| Individual target | `key` | equals `user-brad-bunce` | `heatmap` |
+| MAU Rule | `monthlyActiveUsers` | greater than `40000` | `heatmap` |
+| Plan Rule | `plan` | is one of `enterprise` | `heatmap` |
+| Default | — | all others | `control` |
 
 ---
 
 ## ▶️ Run the App
 
-### Dev Mode
-
+### Development
 ```bash
 npm run dev
 ```
-App runs at [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000)
 
----
+### Docker
 
-### 🐳 Docker
+> ⚠️ `NEXT_PUBLIC_` variables are baked into the JS bundle at **build time**. Pass them as `--build-arg` during `docker build` — not as `-e` at `docker run`.
 
 **Build:**
 ```bash
-docker build --build-arg NEXT_PUBLIC_LD_CLIENT_KEY=your_ld_client_key -t analytics-dashboard .
+docker build \
+  --build-arg NEXT_PUBLIC_LD_CLIENT_KEY=your_client_side_id \
+  -t analytics-dashboard .
 ```
+
 **Run:**
 ```bash
-docker run \
-  -p 3000:3000 \
-  -e LD_SERVER_KEY=your_ld_server_sdk_key \
-  -e GOOGLE_AI_API_KEY=your_google_gemini_api_key \
+docker run -p 3000:3000 \
+  -e LD_SERVER_KEY=your_server_sdk_key \
+  -e GOOGLE_AI_API_KEY=your_google_ai_key \
   analytics-dashboard
 ```
 
----
-
-## 🎯 Feature Flag Targeting: `retention-heatmap-variant`
-
-| Rule                | Description                                  |
-|---------------------|----------------------------------------------|
-| Brad by Key         | If `user.key` == `brad` -> `"beta-variant"`  |
-| MAU Rule            | If `user.isMAU` == true -> `"mau-variant"`   |
-| Plan Rule           | If `user.plan` == `"pro"` -> `"pro-variant"` |
-| Default             | All others -> `"control"`                    |
+Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
 ## 🧑‍💻 Demo Walkthrough
 
 ### Part 1: Release & Remediate
-- In LaunchDarkly, toggle `show-funnel-chart` **ON** to instantly reveal the funnel chart—appears live, no page reload.
-- Toggle **OFF** to instantly roll back—chart disappears, no redeploy needed.
+1. Dashboard loads with the Funnel Chart disabled (`show-funnel-chart` is OFF)
+2. In LaunchDarkly, toggle `show-funnel-chart` **ON**
+3. Chart appears instantly — no page reload (streaming listener fires, timestamp updates)
+4. Toggle **OFF** — chart disappears instantly, zero deployment required
 
 ### Part 2: Targeting
-- In Demo Console, switch user between `"matt"` and `"brad"` to see targeting and variant changes live.
+1. Demo Console (bottom-right) shows **Matt Pierson** active — table view, `control` variant
+2. Click **Brad Bunce** in the Demo Console
+3. `ldClient.identify()` sends Brad's context: 42,000 MAU, enterprise plan
+4. Retention heatmap switches to visual heatmap variant instantly — no page reload
+5. Click **Matt Pierson** — returns to table view
 
 ### Experimentation
-- Click on cohort rows in the retention heatmap to fire `retention-viewed-detail` metric events.
+1. Open the Experiments tab in LaunchDarkly to view the running **Retention Heatmap vs Table** experiment
+2. Click any cohort row in the Retention panel to fire a `retention-viewed-detail` event
+3. Metric data accumulates in the experiment results in real time
 
 ### AI Configs
-- Edit the "Analytics Assistant" AI Config (`ai-model-config` JSON flag) in LaunchDarkly to swap between `gemini-2.5-flash-lite` (Standard) and `gemini-2.5-flash` (Premium) models. Chatbot instantly reflects config changes.
+1. Chat with the Analytics Assistant — note the **gemini-2.5-flash-lite** model badge (Matt's context)
+2. Switch Demo Console to **Brad Bunce**
+3. Send another message — badge updates to **gemini-2.5-flash**
+4. Model and system prompt changed with zero deployment — controlled entirely by the AI Config targeting rule
 
 ---
 
 ## 💡 Business Value
 
-- **MTTR Reduction:** Replace 30–45 minute redeploys with <5s instant flag toggles for rollback and remediation.
-- **Safe Progressive Delivery:** Gradually release features to targeted subgroups rather than all users.
-- **Evidence-based Shipping:** Instrument, experiment, and measure with cohort and event data—minimize risk.
-- **AI Governance:** Control AI prompt/model selection with Feature Flags, enabling rapid iteration and compliance **without new code deploys**.
-
----
+- **MTTR Reduction:** Replace 30–45 minute redeploys with instant flag toggles for rollback and remediation
+- **Safe Progressive Delivery:** Release features to targeted segments — limit blast radius, protect all other users
+- **Evidence-Based Shipping:** Instrument experiments and measure cohort engagement before shipping to everyone
+- **AI Governance:** Control AI model and prompt selection per user segment without engineering sprints or code deploys
