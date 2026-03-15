@@ -41,6 +41,13 @@ Instantly release, remediate, experiment, and control AI behavior with LaunchDar
 git clone https://github.com/matt-pierson/analytics-dashboard.git
 cd analytics-dashboard
 ```
+<<<<<<< Updated upstream
+
+### 2. Install dependencies
+```bash
+npm install
+```
+=======
 
 ### 2. Install dependencies
 ```bash
@@ -49,10 +56,10 @@ npm install
 
 ### 3. Configure environment variables
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Edit `.env`:
+Edit `.env.local` with your values:
 
 | Variable | Where to find it |
 |---|---|
@@ -84,17 +91,83 @@ Edit `.env`:
 | MAU Rule | `monthlyActiveUsers` | greater than `40000` | `heatmap` |
 | Plan Rule | `plan` | is one of `enterprise` | `heatmap` |
 | Default | — | all others | `control` |
+>>>>>>> Stashed changes
 
----
+### 3. Configure environment variables
+```bash
+cp .env.example .env
+```
 
-## ▶️ Run the App
+Edit `.env`:
 
+<<<<<<< Updated upstream
+| Variable | Where to find it |
+|---|---|
+| `NEXT_PUBLIC_LD_CLIENT_KEY` | LD dashboard → Test environment → **Client-side ID** |
+| `LD_SERVER_KEY` | LD dashboard → Test environment → **SDK key** (starts with `sdk-`) |
+| `GOOGLE_AI_API_KEY` | aistudio.google.com → Get API key |
+
+### 4. Create Feature Flags in LaunchDarkly (Test environment)
+
+| Flag Key | Type | Client-side SDK |
+|---|---|---|
+| `show-funnel-chart` | Boolean | ✅ Must enable |
+| `retention-heatmap-variant` | String — variations: `control`, `heatmap`, `sparklines` | ✅ Must enable |
+
+### 5. Create the Analytics Assistant AI Config
+
+1. LD Dashboard → **Create → AI Config → Completion**
+2. Name: `Analytics Assistant`
+3. Add variation **Standard**: model `gemini-2.5-flash-lite`, system prompt for general analytics assistance
+4. Add variation **Premium**: model `gemini-2.5-flash`, system prompt for enterprise-level analysis
+5. Set targeting rule: if `plan` is one of `enterprise` → serve **Premium**
+6. Default rule → serve **Standard**
+
+### 6. Add targeting rules to `retention-heatmap-variant`
+
+| Rule | Attribute | Condition | Serves |
+|---|---|---|---|
+| Individual target | `key` | equals `user-brad-bunce` | `heatmap` |
+| MAU Rule | `monthlyActiveUsers` | greater than `40000` | `heatmap` |
+| Plan Rule | `plan` | is one of `enterprise` | `heatmap` |
+| Default | — | all others | `control` |
+=======
 ### Development
 ```bash
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000)
+>>>>>>> Stashed changes
 
+### Docker
+
+<<<<<<< Updated upstream
+## ▶️ Run the App
+=======
+> ⚠️ `NEXT_PUBLIC_` variables are baked into the JS bundle at **build time**. Pass them as `--build-arg` during `docker build` — not as `-e` at `docker run`.
+>>>>>>> Stashed changes
+
+### Development
+```bash
+<<<<<<< Updated upstream
+npm run dev
+=======
+docker build \
+  --build-arg NEXT_PUBLIC_LD_CLIENT_KEY=your_client_side_id \
+  -t analytics-dashboard .
+```
+
+**Run:**
+```bash
+docker run -p 3000:3000 \
+  -e LD_SERVER_KEY=your_server_sdk_key \
+  -e GOOGLE_AI_API_KEY=your_google_ai_key \
+  analytics-dashboard
+>>>>>>> Stashed changes
+```
+Open [http://localhost:3000](http://localhost:3000)
+
+<<<<<<< Updated upstream
 ### Docker
 
 Spin up the entire environment with a single command. Docker Compose will automatically pull your LaunchDarkly and Google AI SDK keys from your `.env` file and pass them securely to the build and runtime environments.
@@ -104,6 +177,8 @@ Spin up the entire environment with a single command. Docker Compose will automa
 docker compose up --build
 \`\`\`
 
+=======
+>>>>>>> Stashed changes
 Open [http://localhost:3000](http://localhost:3000)
 
 ---
@@ -154,4 +229,8 @@ Open [http://localhost:3000](http://localhost:3000)
 - **MTTR Reduction:** Replace 30–45 minute redeploys with instant flag toggles for rollback and remediation
 - **Safe Progressive Delivery:** Release features to targeted segments — limit blast radius, protect all other users
 - **Evidence-Based Shipping:** Instrument experiments and measure cohort engagement before shipping to everyone
+<<<<<<< Updated upstream
 - **AI Governance:** Control AI model and prompt selection per user segment without engineering sprints or code deploys
+=======
+- **AI Governance:** Control AI model and prompt selection per user segment without engineering sprints or code deploys
+>>>>>>> Stashed changes
