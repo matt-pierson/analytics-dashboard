@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "setup-ld": "node scripts/setup-ld.js"
+    "setup-ld": "node scripts/setup-ld.js",
+    "trigger-off": "bash scripts/trigger-funnel-off.sh",
+    "trigger-on": "bash scripts/trigger-funnel-on.sh"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

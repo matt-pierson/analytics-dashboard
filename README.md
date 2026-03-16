@@ -9,7 +9,7 @@ Instantly release, remediate, experiment, and control AI behavior with LaunchDar
 | Requirement | Description | Status |
 |---|---|---|
 | Part 1: Release & Remediate | Toggle `show-funnel-chart` to reveal/hide funnel chart — streaming UI updates, instant rollback with no deployment | ✅ |
-| Part 1: Flag Trigger | Instant toggle via LaunchDarkly dashboard — no deployment required | ✅ |
+| Part 1: Flag Trigger | Generic trigger webhook fires curl to disable flag instantly — no deployment, no dashboard required | ✅ |
 | Part 2: Targeting | Brad targeted by user key, MAU threshold, and plan attribute | ✅ |
 | Extra Credit: Experimentation | `retention-viewed-detail` click metric tracks cohort engagement across control/heatmap variants | ✅ |
 | Extra Credit: AI Configs | Native Analytics Assistant AI Config swaps Gemini models per user context with no code deploy | ✅ |
@@ -103,6 +103,13 @@ Open [http://localhost:3000](http://localhost:3000)
 2. In LaunchDarkly, toggle `show-funnel-chart` **ON**
 3. Chart appears instantly — no page reload (streaming listener fires, toast confirms the update with a timestamp)
 4. Toggle **OFF** — chart disappears instantly, toast confirms the rollback — zero deployment required
+
+### Flag Trigger (Remediation)
+1. A generic trigger is configured on `show-funnel-chart` with a unique webhook URL
+2. Run `curl -X POST "TRIGGER_URL"` — the flag turns OFF instantly, no dashboard or deployment required
+3. The streaming listener fires and the chart disappears within seconds
+4. A second trigger URL re-enables the flag the same way
+5. In production, these URLs wire directly to PagerDuty or Datadog — when error rates spike, the feature is disabled automatically before a human opens a laptop
 
 ### Part 2: Targeting
 1. Demo Console (bottom-right) shows **Matt Pierson** active — table view, `control` variant
