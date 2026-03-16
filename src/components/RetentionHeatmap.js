@@ -2,6 +2,33 @@
 import React from 'react';
 import { useFlags, useLDClient } from 'launchdarkly-react-client-sdk';
 
+// Async trackEvent function as described
+async function trackEvent(ldClient, eventKey, data) {
+  // Call client track if available
+  if (ldClient && typeof ldClient.track === 'function') {
+    ldClient.track(eventKey, data);
+  }
+
+  // Build the custom event object
+  const event = {
+    kind: 'custom',
+    key: eventKey,
+    creationDate: Date.now(),
+    context: ldClient?.getContext ? ldClient.getContext() : undefined,
+    data,
+  };
+
+  // POST to LaunchDarkly events API
+  await fetch('https://events.launchdarkly.com/events/bulk/69b5a221c0dbd60a35d31875', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-LaunchDarkly-Event-Schema': '4'
+    },
+    body: JSON.stringify([event])
+  });
+}
+
 // Static cohort data as instructed
 const COHORT_DATA = [
   {
@@ -171,11 +198,11 @@ export default function RetentionHeatmap() {
       ViewComp = TableView; label = 'tableView'; break;
   }
 
-  // Row click handler: tracks via LD
+  // Row click handler: tracks via LD and direct API
   function handleRowClick(cohortName) {
-    if (ldClient && typeof ldClient.track === 'function') {
-      ldClient.track('retention-viewed-detail', { cohort: cohortName });
-    }
+    trackEvent(ldClient, 'retention-viewed-detail', { cohort: cohortName })
+      .then(() => console.log('event sent:', cohortName))
+      .catch(console.error);
   }
 
   return (

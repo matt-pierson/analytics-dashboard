@@ -23,6 +23,7 @@ Instantly release, remediate, experiment, and control AI behavior with LaunchDar
 - **AI:** Google Gemini via `@google/generative-ai` (free tier)
 - **Charts:** Recharts
 - **Demo Polish:** react-hot-toast — surfaces flag evaluations and context switches as real-time toast notifications
+- **Event Delivery:** Custom metric events are delivered via direct POST to the LaunchDarkly Events API due to a known incompatibility between the React Client SDK's internal event processor and Next.js 16 + Turbopack in development. Flag evaluations and streaming work normally.
 
 ---
 

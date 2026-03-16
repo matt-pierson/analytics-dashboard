@@ -1,11 +1,16 @@
 'use client';
-/**
- * This must be a separate client component so layout.js stays a Server Component
- * and avoids Next.js App Router hydration mismatches.
- */
-import { asyncWithLDProvider } from 'launchdarkly-react-client-sdk';
+import { asyncWithLDProvider, useLDClient } from 'launchdarkly-react-client-sdk';
 import { useEffect, useState } from 'react';
 import { users } from '@/lib/userContexts';
+import { setLDClient } from '@/lib/ldClient';
+
+function LDClientCapture() {
+  const client = useLDClient();
+  useEffect(() => {
+    if (client) setLDClient(client);
+  }, [client]);
+  return null;
+}
 
 export default function LDProviderWrapper({ children }) {
   const [LDProvider, setLDProvider] = useState(null);
@@ -14,10 +19,15 @@ export default function LDProviderWrapper({ children }) {
     let isMounted = true;
 
     async function initLDProvider() {
+
       const provider = await asyncWithLDProvider({
         clientSideID: process.env.NEXT_PUBLIC_LD_CLIENT_KEY,
-        user: users.standard,
-        streaming: true,
+        context: users.standard,
+        options: {
+          streaming: true,
+          sendEvents: true,
+
+        },
       });
       if (isMounted) {
         setLDProvider(() => provider);
@@ -25,14 +35,15 @@ export default function LDProviderWrapper({ children }) {
     }
 
     initLDProvider();
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
-  if (!LDProvider) {
-    return <>{children}</>;
-  }
+  if (!LDProvider) return <>{children}</>;
 
-  return <LDProvider>{children}</LDProvider>;
+  return (
+    <LDProvider>
+      <LDClientCapture />
+      {children}
+    </LDProvider>
+  );
 }
