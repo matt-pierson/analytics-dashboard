@@ -23,8 +23,8 @@ Instantly release, remediate, experiment, and control AI behavior with LaunchDar
 - **AI:** Google Gemini via `@google/generative-ai` (free tier)
 - **Charts:** Recharts
 - **Demo Polish:** react-hot-toast — surfaces flag evaluations and context switches as real-time toast notifications
+- **AI Development Governance:** `.cursorrules` + `.cursor/rules/launchdarkly.mdc` — architectural guardrails baked into Cursor AI so every generated component respects LaunchDarkly SDK boundaries, the hydration-safe provider pattern, and environment variable rules automatically
 - **Event Delivery:** Custom metric events are delivered via direct POST to the LaunchDarkly Events API due to a known incompatibility between the React Client SDK's internal event processor and Next.js 16 + Turbopack in development. Flag evaluations and streaming work normally.
-
 ---
 
 ## 📋 Prerequisites
@@ -50,7 +50,7 @@ npm install
 
 ### 3. Configure environment variables
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
 Edit `.env`:
@@ -60,6 +60,8 @@ Edit `.env`:
 | `NEXT_PUBLIC_LD_CLIENT_KEY` | LD dashboard → Test environment → **Client-side ID** |
 | `LD_SERVER_KEY` | LD dashboard → Test environment → **SDK key** (starts with `sdk-`) |
 | `GOOGLE_AI_API_KEY` | aistudio.google.com → Get API key |
+| `LD_API_TOKEN` | LD dashboard → Account Settings → Authorization → Personal tokens (Writer role) | 
+| 'LD_PROJECT_KEY` | Your LD project key — visible in the dashboard URL |
 
 ### 4. Provision LaunchDarkly resources
 Add `LD_API_TOKEN` (Writer role) and `LD_PROJECT_KEY` to your `.env`, then:
@@ -68,6 +70,14 @@ npm run setup-ld
 ```
 This creates both feature flags with targeting rules, the custom metric, and the AI Config.  
 **One manual step:** in the LD dashboard → **AI Configs → Analytics Assistant**, add a rule: if `plan` is one of `enterprise` → serve **Premium**.
+
+### 5. Create the experiment
+
+In the LD dashboard → **Experiments** → **Create experiment**:
+- Name: `Retention Heatmap vs Table`
+- Flag: `retention-heatmap-variant` — 50% `control` / 50% `heatmap`
+- Metric: `retention-viewed-detail`
+- Click **Start recording**
 
 ---
 
@@ -138,3 +148,4 @@ Open [http://localhost:3000](http://localhost:3000)
 - **Safe Progressive Delivery:** Release features to targeted segments — limit blast radius, protect all other users
 - **Evidence-Based Shipping:** Instrument experiments and measure cohort engagement before shipping to everyone
 - **AI Governance:** Control AI model and prompt selection per user segment without engineering sprints or code deploys
+- **AI Development Governance:** `.cursorrules` and `.cursor/rules/` encode architectural standards directly into the IDE — every AI-generated component respects the LaunchDarkly SDK boundaries, hydration-safe provider pattern, and environment variable rules automatically
