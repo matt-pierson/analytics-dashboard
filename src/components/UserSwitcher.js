@@ -23,10 +23,14 @@ export default function UserSwitcher() {
   const [currentUser, setCurrentUser] = useState('standard');
   const [isSwitching, setIsSwitching] = useState(false);
 
+ //ldclient can be null before the provider resolves — always null-check before calling any method
+ //isSwitching is a guard to prevent double-click race conditions
   const handleSwitch = async (key) => {
     if (!ldClient || isSwitching || key === currentUser) return;
     setIsSwitching(true);
     setCurrentUser(key);
+    //identify() sends new user context to LaunchDarkly so flag evaluation 
+    //can happen immediately via streaming listener, without reloading the page
     try {
       await ldClient.identify(users[key]);
     } finally {

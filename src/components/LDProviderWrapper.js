@@ -1,4 +1,5 @@
 'use client';
+// separate client component keeps layout.js a server component, preventing hydration mismatches
 import { asyncWithLDProvider, useLDClient } from 'launchdarkly-react-client-sdk';
 import { useEffect, useState } from 'react';
 import { users } from '@/lib/userContexts';
@@ -19,7 +20,7 @@ export default function LDProviderWrapper({ children }) {
     let isMounted = true;
 
     async function initLDProvider() {
-
+      // use context not user, streaming and sendEvents must be nested inside options
       const provider = await asyncWithLDProvider({
         clientSideID: process.env.NEXT_PUBLIC_LD_CLIENT_KEY,
         context: users.standard,

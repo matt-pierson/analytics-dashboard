@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+// Named import — NOT default. `import init from ...` causes "init is not a function".
 import { init } from '@launchdarkly/node-server-sdk';
 import { initAi } from '@launchdarkly/server-sdk-ai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -31,7 +32,7 @@ export async function POST(req) {
   try {
     const { message, userKey, userPlan } = await req.json();
 
-    // Setup LD AI context/user
+    // Setup LD AI context/user. Pass userKey and userPlan from the frontend to ensure server-side targeting fires correctly.
     const context = { 
       kind: 'user', 
       key: userKey || 'server-evaluation',
@@ -52,6 +53,7 @@ export async function POST(req) {
     }
 
     // Extract model name and prompt
+    // aiConfig.model is an OBJECT, not a string — use .name to extract the model ID.
     const modelName = aiConfig.model?.name || 'gemini-2.5-flash-lite';
     const systemPrompt = aiConfig.messages?.[0]?.content || 'You are a helpful product analytics assistant.';
 

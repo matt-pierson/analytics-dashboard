@@ -1,5 +1,7 @@
-// Matt (500 MAU) hits the default rule and gets 'control'.
-// Brad (42k MAU) hits the MAU and plan rules and gets 'heatmap'.
+// Two demo personas for the Demo Console. Attributes are used by LD targeting rules:
+// - monthlyActiveUsers > 40,000 → heatmap variant
+// - plan = enterprise → heatmap variant + Premium AI Config
+// - user-brad-bunce is individually targeted by key
 export const users = {
   standard: {
     key: "user-matt-pierson",

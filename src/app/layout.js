@@ -1,3 +1,4 @@
+// Server component: no use client directive. LD provider lives in LDProviderWrapper.js to prevent hydration mismatches
 import '@/components/LDProviderWrapper';
 import LDProviderWrapper from '@/components/LDProviderWrapper';
 import './globals.css';

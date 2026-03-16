@@ -3,6 +3,10 @@ import React from 'react';
 import { useFlags, useLDClient } from 'launchdarkly-react-client-sdk';
 
 // Async trackEvent function as described
+// Direct POST to LD events endpoint. Bypasses known incompatibility between
+// the React Client SDK's internal event processor and Next.js 16 + Turbopack
+// in development. The SDK track() call is kept as a belt-and-suspenders fallback.
+// This does NOT affect Docker/production builds — only `npm run dev`.
 async function trackEvent(ldClient, eventKey, data) {
   // Call client track if available
   if (ldClient && typeof ldClient.track === 'function') {

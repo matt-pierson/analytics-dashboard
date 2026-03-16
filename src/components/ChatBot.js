@@ -40,6 +40,8 @@ export default function ChatBot() {
 
     try {
       ldClient?.track('chatbot-message-sent');
+      // Pass userKey and userPlan from the frontend to ensure server-side targeting fires correctly.
+      // otherwise server always evalutates as default (Standard) variation
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
